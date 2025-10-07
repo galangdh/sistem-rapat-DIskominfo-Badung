@@ -1,118 +1,12 @@
 import 'package:flutter/material.dart';
-import 'widgets/custom_bottom_navbar.dart';
-import 'pages/home_page.dart';
-import 'pages/kelola_page.dart'; // Import KelolaPage
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        // Anda bisa menambahkan font family jika ada
-        // fontFamily: 'Poppins',
-      ),
-      home: const MainScreen(),
-    );
-  }
-}
-
-class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-
-  // Pastikan Anda sudah membuat semua halaman ini
-  final List<Widget> _pages = [
-    const HomePage(),
-    const KelolaPage(),
-    const StatistikPage(),
-    const ProfilePage(), // Halaman profil yang akan kita modifikasi
-  ];
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Body extend di belakang navbar
-      body: _pages[_currentIndex],
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// STATISTIK PAGE (Tetap sama)
-// ============================================================================
-class StatistikPage extends StatelessWidget {
-  const StatistikPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Statistik',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C3E50),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Center(
-                  child: Text(
-                    'Halaman Statistik',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                const SizedBox(height: 100), // Extra space untuk navbar
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// PROFILE PAGE (INI YANG DIMODIFIKASI)
-// ============================================================================
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Menggunakan UI profil yang sudah kita buat sebelumnya
-    return Scaffold(
+      // Ganti warna latar belakang sesuai tema aplikasi Anda
       backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -122,23 +16,29 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Tombol kembali atau aksi lainnya
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
                     icon: const Icon(Icons.logout, color: Colors.black54),
                     onPressed: () {
-                      // Aksi logout
+                      // Tambahkan aksi disini, misal: Navigator.pop(context) atau fungsi logout
                     },
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Avatar Pengguna
                 const CircleAvatar(
                   radius: 60,
+                  // Ganti dengan gambar dari assets atau network
                   backgroundImage:
                       NetworkImage('https://i.pravatar.cc/150?img=32'),
                   backgroundColor: Colors.transparent,
                 ),
                 const SizedBox(height: 16),
+
+                // Nama dan Jabatan
                 const Text(
                   'John Doe',
                   style: TextStyle(
@@ -156,6 +56,8 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
+
+                // Menampilkan informasi pengguna menggunakan widget kustom
                 const ProfileInfoField(
                   label: 'Nomor Induk Pegawai',
                   value: '221535403111',
@@ -179,8 +81,6 @@ class ProfilePage extends StatelessWidget {
                   value: '***************',
                   iconData: Icons.lock_outline,
                 ),
-                // Tambahkan SizedBox di bawah agar tidak tertutup BottomNavBar
-                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -190,9 +90,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// WIDGET BANTUAN UNTUK PROFILE PAGE (INI YANG DITAMBAHKAN)
-// ============================================================================
+// Widget kustom untuk setiap baris informasi
 class ProfileInfoField extends StatelessWidget {
   final String label;
   final String value;
