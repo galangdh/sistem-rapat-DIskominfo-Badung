@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'widgets/custom_bottom_navbar.dart';
 import 'pages/home_page.dart';
-import 'pages/kelola_page.dart'; // Import KelolaPage
+import 'pages/kelola_page.dart';
+import 'pages/login_page.dart'; // Import LoginPage
+import 'pages/profile_page.dart'; // Import LoginPage
 
 void main() {
   runApp(const MyApp());
@@ -14,14 +16,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'SiRapat',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1E5BA8)),
         useMaterial3: true,
         // Anda bisa menambahkan font family jika ada
         // fontFamily: 'Poppins',
       ),
-      home: const MainScreen(),
+      home: const LoginPage(), // Mulai dari LoginPage
     );
   }
 }
@@ -41,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomePage(),
     const KelolaPage(),
     const StatistikPage(),
-    const ProfilePage(), // Halaman profil yang akan kita modifikasi
+    const ProfileScreen(), // Halaman profil yang akan kita modifikasi
   ];
 
   @override
@@ -103,92 +105,6 @@ class StatistikPage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// PROFILE PAGE (INI YANG DIMODIFIKASI)
-// ============================================================================
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Menggunakan UI profil yang sudah kita buat sebelumnya
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.logout, color: Colors.black54),
-                    onPressed: () {
-                      // Aksi logout
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const CircleAvatar(
-                  radius: 60,
-                  backgroundImage:
-                      NetworkImage('https://i.pravatar.cc/150?img=32'),
-                  backgroundColor: Colors.transparent,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'John Doe',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Programer Backend',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                const ProfileInfoField(
-                  label: 'Nomor Induk Pegawai',
-                  value: '221535403111',
-                  iconData: Icons.badge_outlined,
-                ),
-                const SizedBox(height: 16),
-                const ProfileInfoField(
-                  label: 'Email',
-                  value: 'johndoe@example.com',
-                  iconData: Icons.email_outlined,
-                ),
-                const SizedBox(height: 16),
-                const ProfileInfoField(
-                  label: 'No. Telpon',
-                  value: '(+62) 81234122311',
-                  iconData: Icons.phone_outlined,
-                ),
-                const SizedBox(height: 16),
-                const ProfileInfoField(
-                  label: 'Password',
-                  value: '***************',
-                  iconData: Icons.lock_outline,
-                ),
-                // Tambahkan SizedBox di bawah agar tidak tertutup BottomNavBar
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ============================================================================
 // WIDGET BANTUAN UNTUK PROFILE PAGE (INI YANG DITAMBAHKAN)
