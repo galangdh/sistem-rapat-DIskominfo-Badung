@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+// --- TAMBAHAN IMPORT ---
+import 'package:intl/date_symbol_data_local.dart';
+// -----------------------
 import 'widgets/custom_bottom_navbar.dart';
 import 'pages/home_page.dart';
 import 'pages/kelola_page.dart';
 import 'pages/login_page.dart'; // Import LoginPage
-import 'pages/profile_page.dart'; // Import LoginPage
+import 'pages/profile_page.dart'; // Import ProfileScreen (seharusnya profile_page.dart)
 
-void main() {
+// --- PERUBAHAN: Jadikan main async ---
+Future<void> main() async {
+  // --- TAMBAHAN INISIALISASI ---
+  WidgetsFlutterBinding.ensureInitialized(); // Pastikan binding siap
+  await initializeDateFormatting('id_ID', null); // Inisialisasi locale
+  // -----------------------------
   runApp(const MyApp());
 }
 
@@ -23,7 +31,14 @@ class MyApp extends StatelessWidget {
         // Anda bisa menambahkan font family jika ada
         // fontFamily: 'Poppins',
       ),
-      home: const LoginPage(), // Mulai dari LoginPage
+      // --- PERBAIKAN: Jika login berhasil, arahkan ke MainScreen ---
+      // Anda perlu logika autentikasi di sini. Untuk sementara,
+      // kita anggap mulai dari MainScreen setelah setup locale.
+      // Jika ingin mulai dari login, biarkan home: const LoginPage(),
+      // tapi pastikan LoginPage mengarahkan ke MainScreen setelah login berhasil.
+      home: const MainScreen(),
+      // home: const LoginPage(), // Mulai dari LoginPage jika diinginkan
+      // -----------------------------------------------------------
     );
   }
 }
@@ -42,12 +57,16 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const HomePage(),
     const KelolaPage(),
-    const StatistikPage(),
-    const ProfileScreen(), // Halaman profil yang akan kita modifikasi
+    const StatistikPage(), // Pastikan file StatistikPage ada
+    const ProfileScreen(), // Pastikan file ProfileScreen ada
   ];
 
   @override
   Widget build(BuildContext context) {
+    // --- PERBAIKAN: Pastikan CustomBottomNavBar diimpor dengan benar ---
+    // Jika CustomBottomNavBar ada di 'widgets/custom_bottom_navbar.dart',
+    // import di atas sudah benar.
+    // -------------------------------------------------------------
     return Scaffold(
       extendBody: true, // Body extend di belakang navbar
       body: _pages[_currentIndex],
@@ -64,8 +83,10 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 // ============================================================================
-// STATISTIK PAGE (Tetap sama)
+// STATISTIK PAGE (Placeholder)
 // ============================================================================
+// Pastikan Anda membuat file terpisah untuk StatistikPage (misal: pages/statistik_page.dart)
+// dan mengimpornya di atas jika diperlukan.
 class StatistikPage extends StatelessWidget {
   const StatistikPage({Key? key}) : super(key: key);
 
@@ -73,29 +94,24 @@ class StatistikPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
+      appBar:
+          AppBar(title: const Text('Statistik')), // Tambahkan AppBar sederhana
+      body: const SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Statistik',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C3E50),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Center(
+                // --- PERBAIKAN: Gunakan Center untuk konten placeholder ---
+                Center(
                   child: Text(
                     'Halaman Statistik',
                     style: TextStyle(fontSize: 18),
                   ),
                 ),
-                const SizedBox(height: 100), // Extra space untuk navbar
+                // ---------------------------------------------------
+                SizedBox(height: 100), // Extra space untuk navbar
               ],
             ),
           ),
@@ -105,10 +121,10 @@ class StatistikPage extends StatelessWidget {
   }
 }
 
-
 // ============================================================================
 // WIDGET BANTUAN UNTUK PROFILE PAGE (INI YANG DITAMBAHKAN)
 // ============================================================================
+// Sebaiknya ini juga dipindah ke file terpisah (misal: widgets/profile_info_field.dart)
 class ProfileInfoField extends StatelessWidget {
   final String label;
   final String value;
@@ -171,3 +187,27 @@ class ProfileInfoField extends StatelessWidget {
     );
   }
 }
+
+
+
+// kalau mau coba akses punya pewagai pakai ini komen yang atas dan buka komen yang bawah
+
+// ___________________________PEGAWAIII_____________________________
+// import 'package:flutter/material.dart';
+// import 'widgets/custom_bottom_navbar_pegawai.dart';
+
+// void main() {
+//   runApp(const PegawaiApp());
+// }
+
+// class PegawaiApp extends StatelessWidget {
+//   const PegawaiApp({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: CustomBottomNavbarPegawai(),
+//     );
+//   }
+// }

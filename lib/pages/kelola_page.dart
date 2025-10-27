@@ -1,9 +1,27 @@
-// ============================================================================
-// FILE: lib/pages/kelola_page.dart
-// Buat file baru atau ganti KelolaPage di main.dart
-// ============================================================================
-
 import 'package:flutter/material.dart';
+// --- PERBAIKAN: Mengembalikan ke import relatif ---
+import './detail_page.dart';
+// ---------------------------------------------
+
+// --- Palet Warna Sesuai Gambar ---
+const Color kPrimaryBlue = Color(0xFF2962FF); // Biru header & tombol
+const Color kCardBackground = Colors.white;
+const Color kPageBackground = Color(0xFFF4F7FC); // Latar belakang halaman
+const Color kInfoBackground = Color(0xFFF7F9FC); // Latar info di dalam card
+const Color kSearchBorderColor = Color(0xFFE0E0E0);
+const Color kTextColor = Color(0xFF333333);
+const Color kSubTextColor = Color(0xFF666666);
+
+const Color kBadgeRed = Color(0xFFF44336);
+const Color kBadgeOrange = Color(0xFFFF9800);
+const Color kBadgeGreen = Color(0xFF4CAF50);
+
+const Color kButtonOrange = Color(0xFFF57C00);
+
+// --- DEFINISI ENUM DAN CLASS DIHAPUS ---
+// Definisi Enum MeetingStatus dan Class Meeting sekarang
+// diambil dari file './detail_page.dart'
+// untuk menghindari konflik tipe.
 
 class KelolaPage extends StatefulWidget {
   const KelolaPage({Key? key}) : super(key: key);
@@ -13,211 +31,340 @@ class KelolaPage extends StatefulWidget {
 }
 
 class _KelolaPageState extends State<KelolaPage> {
-  int _selectedTab = 0; // 0: Aktif, 1: Terjadwal, 2: Selesai
+  // Data dummy, ganti ini dengan data asli dari state management/API Anda
+  final List<Meeting> meetings = [
+    Meeting(
+      title: 'Rapat Koordinasi',
+      status: MeetingStatus.ongoing,
+      date: '01-02-2025',
+      time: '09.00 - 11.00',
+      participants: 12,
+    ),
+    Meeting(
+      title: 'Rapat Evaluasi',
+      status: MeetingStatus.upcoming,
+      date: '01-02-2025',
+      time: '09.00 - 11.00',
+      participants: 12,
+    ),
+    Meeting(
+      title: 'Rapat Anggaran',
+      status: MeetingStatus.completed,
+      date: '01-02-2025',
+      time: '09.00 - 11.00',
+      participants: 12,
+    ),
+    Meeting(
+      title: 'Review Proyek Website',
+      status: MeetingStatus.upcoming,
+      date: '02-02-2025',
+      time: '13.00 - 15.00',
+      participants: 8,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                const Text(
-                  'Kelola Rapat',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E3C72),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 1,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 24),
-
-                // Tab Buttons
-                Row(
-                  children: [
-                    _buildTabButton('Aktif', 0),
-                    const SizedBox(width: 12),
-                    _buildTabButton('Terjadwal', 1),
-                    const SizedBox(width: 12),
-                    _buildTabButton('Selesai', 2),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Meeting Cards
-                _buildMeetingCard(
-                  'Rapat\nkoordinasi IT',
-                  '14.00-16.00',
-                  'Ruang A',
-                  '8/15 Hadir',
-                  'LIVE',
-                  const Color(0xFF1E3C72),
-                ),
-                const SizedBox(height: 16),
-
-                _buildMeetingCard(
-                  'Review\nProyek Website',
-                  '10.00-12.00',
-                  'Ruang B',
-                  '12/12 Hadir',
-                  'LIVE',
-                  const Color(0xFF1E3C72),
-                ),
-                const SizedBox(height: 16),
-
-                _buildMeetingCard(
-                  'Evaluasi\nKinerja Tim',
-                  '16.00-18.00',
-                  'Ruang C',
-                  '5/10 Hadir',
-                  'LIVE',
-                  const Color(0xFF1E3C72),
-                ),
-                const SizedBox(height: 16),
-
-                _buildMeetingCard(
-                  'Planning\nBudget 2025',
-                  '09.00-11.00',
-                  'Ruang Meeting',
-                  '3/8 Hadir',
-                  'LIVE',
-                  const Color(0xFF1E3C72),
-                ),
-                const SizedBox(height: 100), // Extra space untuk navbar
-              ],
-            ),
+      backgroundColor: kPageBackground,
+      appBar: _buildCustomAppBar(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              const SizedBox(height: 20),
+              // Gunakan ListView.builder untuk data dinamis
+              ListView.separated(
+                physics:
+                    const NeverScrollableScrollPhysics(), // Biar tidak double scroll
+                shrinkWrap: true,
+                itemCount: meetings.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  return _MeetingCard(meeting: meetings[index]);
+                },
+              ),
+              const SizedBox(height: 100), // Extra space untuk navbar
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMeetingCard(
-    String title,
-    String time,
-    String room,
-    String attendance,
-    String badge,
-    Color badgeColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1.5,
-        ),
-      ),
-      child: Column(
+  // Header Biru Kustom
+  AppBar _buildCustomAppBar() {
+    return AppBar(
+      backgroundColor: kPrimaryBlue,
+      elevation: 0,
+      automaticallyImplyLeading: false, // Hapus tombol back jika tidak perlu
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E3C72),
-                    height: 1.3,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: badgeColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  badge,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '$time  |',
+          const SizedBox(height: 10), // Padding atas
+          const Text(
+            'Daftar Rapat',
             style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            room,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
+          const SizedBox(height: 8),
+          Container(
+            height: 3,
+            width: 100, // Lebar garis bawah
+            color: Colors.white.withOpacity(0.5),
+          ),
+        ],
+      ),
+      toolbarHeight: 80, // Tinggi AppBar
+    );
+  }
+
+  // Search Bar
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: kCardBackground,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Cari rapat...',
+          hintStyle: const TextStyle(color: kSubTextColor),
+          prefixIcon: const Icon(Icons.search, color: kSubTextColor),
+          suffixIcon: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: kInfoBackground,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.filter_list, color: kPrimaryBlue),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.people,
-                size: 18,
-                color: Colors.grey.shade700,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                attendance,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.red.shade400,
-                  fontWeight: FontWeight.w500,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: kSearchBorderColor),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: kSearchBorderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: kPrimaryBlue),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Widget Kartu Rapat yang sudah di-refactor
+class _MeetingCard extends StatelessWidget {
+  final Meeting meeting;
+
+  const _MeetingCard({Key? key, required this.meeting}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget badge;
+    Widget actionButton;
+
+    // Fungsi helper untuk navigasi agar tidak duplikat kode
+    void navigateToDetail() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              DetailPage(meeting: meeting), // Diubah dari DetailRapatPage
+        ),
+      );
+    }
+
+    // Tentukan badge dan tombol aksi berdasarkan status
+    switch (meeting.status) {
+      case MeetingStatus.ongoing:
+        badge = _buildBadge('Sedang Berlangsung', kBadgeRed, Icons.sensors);
+        actionButton = _buildActionButton(
+          'Gabung Sekarang',
+          kPrimaryBlue,
+          Colors.white,
+          navigateToDetail, // Aksi navigasi
+        );
+        break;
+      case MeetingStatus.upcoming:
+        badge = _buildBadge('Mendatang', kBadgeOrange, Icons.timelapse);
+        actionButton = _buildActionButton(
+          'Lihat Detail',
+          kButtonOrange,
+          Colors.white,
+          navigateToDetail, // Aksi navigasi
+        );
+        break;
+      case MeetingStatus.completed:
+        badge = _buildBadge('Selesai', kBadgeGreen, Icons.check_circle);
+        actionButton = _buildActionButton(
+          'Lihat Detail',
+          kButtonOrange, // Tetap orange sesuai gambar
+          Colors.white,
+          navigateToDetail, // Aksi navigasi
+        );
+        break;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: kCardBackground,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueGrey.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Baris Judul dan Badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  // Ditambahkan Flexible di sini untuk judul yang panjang
+                  child: Text(
+                    meeting.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: kTextColor,
+                    ),
+                  ),
                 ),
+                const SizedBox(
+                    width: 8), // Memberi jarak antara judul dan badge
+                badge,
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Blok Info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kInfoBackground,
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
+              child: Column(
+                children: [
+                  _buildInfoRow(
+                      Icons.calendar_today, meeting.date, meeting.time),
+                  const SizedBox(height: 8),
+                  _buildInfoRow(Icons.people_outline,
+                      '${meeting.participants} Peserta', null),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Tombol Aksi
+            actionButton,
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper untuk Badge (Status)
+  Widget _buildBadge(String text, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTabButton(String text, int index) {
-    final isSelected = _selectedTab == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF1E3C72) : Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(20),
+  // Helper untuk baris info (Tanggal, Waktu, Peserta)
+  Widget _buildInfoRow(IconData icon, String textLeft, String? textRight) {
+    return Row(
+      children: [
+        Icon(icon, color: kSubTextColor, size: 16),
+        const SizedBox(width: 8),
+        // --- FIX DIMULAI ---
+        // Dibungkus Flexible agar bisa menyusut jika textRight ada
+        Flexible(
+          child: Text(
+            textLeft,
+            style: const TextStyle(color: kSubTextColor, fontSize: 13),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis, // Hindari overflow
+            softWrap: false, // Hindari wrapping
+          ),
+        ),
+        // --- FIX SELESAI ---
+        if (textRight != null) ...[
+          const Spacer(), // Dorong ke kanan
+          Icon(Icons.access_time, color: kSubTextColor, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            textRight,
+            style: const TextStyle(color: kSubTextColor, fontSize: 13),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // Helper untuk Tombol Aksi
+  Widget _buildActionButton(
+      String text, Color color, Color textColor, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: textColor,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey.shade700,
-            fontSize: 14,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),
     );
