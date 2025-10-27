@@ -64,6 +64,10 @@ class _DetailPageState extends State<DetailPage>
   late TabController _tabController;
   Widget? _currentFab; // <-- State untuk FAB dinamis
 
+  // --- BARU: Controller untuk chat ---
+  late TextEditingController _chatMessageController;
+  // -----------------------------------
+
   // --- DATA DUMMY UNTUK PESERTA ---
   final List<Participant> participants = [
     Participant(name: 'John Doe', role: 'Kadis IT'),
@@ -91,12 +95,21 @@ class _DetailPageState extends State<DetailPage>
     _tabController.addListener(_handleTabSelection);
     // Inisialisasi FAB pertama kali
     _currentFab = _buildChatFab();
+
+    // --- BARU: Inisialisasi controller chat ---
+    _chatMessageController = TextEditingController();
+    // ---------------------------------------
   }
 
   @override
   void dispose() {
     _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
+
+    // --- BARU: Dispose controller chat ---
+    _chatMessageController.dispose();
+    // -----------------------------------
+
     super.dispose();
   }
 
@@ -133,7 +146,9 @@ class _DetailPageState extends State<DetailPage>
   Widget _buildChatFab() {
     return FloatingActionButton(
       onPressed: () {
-        // Aksi untuk FAB Chat
+        // --- DIUBAH: Panggil bottom sheet chat ---
+        _showChatBottomSheet(context);
+        // ---------------------------------------
       },
       backgroundColor: kPrimaryBlue,
       child: const Icon(Icons.chat_bubble_rounded, color: Colors.white),
@@ -208,6 +223,24 @@ class _DetailPageState extends State<DetailPage>
     );
   }
   // ----------------------------------------------------
+
+  // --- BARU: FUNGSI UNTUK MENAMPILKAN CHAT BOTTOM SHEET ---
+  void _showChatBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Penting untuk DraggableScrollableSheet
+      backgroundColor: Colors.transparent, // Biarkan child yang mengatur warna
+      builder: (context) {
+        return ChatBottomSheet(
+          rapatTitle: widget.meeting.title,
+          // Buat string peserta dari data dummy
+          rapatPeserta: '${participants.length} Peserta',
+          messageController: _chatMessageController,
+        );
+      },
+    );
+  }
+  // -------------------------------------------------------
 
   // --- FUNGSI UNTUK MENAMPILKAN MODAL OPSI ---
   void _showOptionsMenu(BuildContext context) {
@@ -1102,6 +1135,322 @@ class __EditSummaryDialogState extends State<_EditSummaryDialog> {
         ),
       ),
       // --- PERBAIKAN SELESAI ---
+    );
+  }
+}
+
+// ------------------------------------------------------------------
+// --- BARU: PASTE KODE ChatBottomSheet ANDA DI SINI ---
+// ------------------------------------------------------------------
+
+// Widget Chat Bottom Sheet
+class ChatBottomSheet extends StatefulWidget {
+  final String rapatTitle;
+  final String rapatPeserta;
+  final TextEditingController messageController;
+
+  const ChatBottomSheet({
+    Key? key,
+    required this.rapatTitle,
+    required this.rapatPeserta,
+    required this.messageController,
+  }) : super(key: key);
+
+  @override
+  State<ChatBottomSheet> createState() => _ChatBottomSheetState();
+}
+
+class _ChatBottomSheetState extends State<ChatBottomSheet> {
+  final List<Map<String, dynamic>> messages = [
+    {
+      'user': 'user A',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': false,
+    },
+    {
+      'user': 'Me',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': true,
+    },
+    {
+      'user': 'Me',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': true,
+    },
+    {
+      'user': 'user B',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': false,
+    },
+    {
+      'user': 'Me',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': true,
+    },
+    {
+      'user': 'user B',
+      'message':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing do tempor incididunt ulamco quis nostrud exercitation',
+      'isMe': false,
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Drag indicator
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title and back button
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                          color: const Color(0xFF2C3E50),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.rapatTitle,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2C3E50),
+                                ),
+                              ),
+                              Text(
+                                widget.rapatPeserta,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF999999),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Messages List
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/background.jpg'),
+                      fit: BoxFit.cover,
+                      opacity: 0.32,
+                    ),
+                  ),
+                  child: ListView.builder(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = messages[index];
+                      final isMe = msg['isMe'] ?? false;
+
+                      return Align(
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.7,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: isMe
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              if (!isMe)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 4, bottom: 4),
+                                  child: Text(
+                                    msg['user'],
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2C3E50),
+                                    ),
+                                  ),
+                                ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? const Color(0xFF2C5282)
+                                      : Color.fromARGB(255, 255, 255, 255),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: const Radius.circular(12),
+                                    topRight: const Radius.circular(12),
+                                    bottomLeft: isMe
+                                        ? const Radius.circular(12)
+                                        : const Radius.circular(4),
+                                    bottomRight: isMe
+                                        ? const Radius.circular(4)
+                                        : const Radius.circular(12),
+                                  ),
+                                  border: !isMe
+                                      ? Border.all(
+                                          color: const Color(0xFFE0E0E0),
+                                          width: 1,
+                                        )
+                                      : null,
+                                ),
+                                child: Text(
+                                  msg['message'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isMe
+                                        ? Colors.white
+                                        : const Color(0xFF2C3E50),
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Input Field
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: const Color(0xFFE0E0E0),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: widget.messageController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Ketik notulensi",
+                            hintStyle: TextStyle(
+                              color: Color(0xFFCCCCCC),
+                              fontSize: 13,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF2C5282),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          // Logic untuk mengirim pesan
+                          if (widget.messageController.text.isNotEmpty) {
+                            setState(() {
+                              messages.add({
+                                'user': 'Me',
+                                'message': widget.messageController.text,
+                                'isMe': true,
+                              });
+                            });
+                            widget.messageController.clear();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
